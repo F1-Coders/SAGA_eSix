@@ -59,3 +59,7 @@ class ESIX:
                     send_msg(self.msg.format(host, if_name, if_status))
                 data[host].append({if_name: if_status})
         return data
+    
+if __name__ == "__main__":
+    esix = ESIX()
+    esix.get_port_health()
