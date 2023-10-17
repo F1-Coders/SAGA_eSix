@@ -28,7 +28,7 @@ def write_ts_data(device, metric, value):
     data_point = influxdb_client.Point(device).field(metric, value)
     api_writer.write(bucket=bucket, org=org, record=data_point)
 
-def send_msg(self, msg):
+def send_msg(msg):
     msg_header = {"Content-Type": "application/json"}
     response = requests.post(teams_token, headers=msg_header, json={'text': msg})
     if not response.ok:
