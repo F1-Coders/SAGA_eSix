@@ -38,7 +38,7 @@ def filter(data_str):
 class ESIX:
     def __init__(self):
         self.subject = 'SAGA Found eSix Device Interface Down!'
-        self.body = '<h1>Device {}</h1><br><p>Interface {} is {}!</p>'
+        self.body = 'Device: {}\n - Interface {} is {}!\n\nThis is a test mail, do not reply!'
         self.data = self.get_port_health()
 
     def get_port_health(self):

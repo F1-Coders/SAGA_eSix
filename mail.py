@@ -17,5 +17,6 @@ def send_mail(subject, body):
                     subject=subject,
                     body=body)
     email.sender = Mailbox(email_address='saga.eubts@hotmail.com')
-    email.to_recipients = [Mailbox(email_address='jackal.cho@f1.hk')]
+    email.to_recipients = [Mailbox(email_address='jackal.cho@f1.hk'),
+                           Mailbox(email_address='servicedesk@f1.hk')]
     email.send_and_save()
