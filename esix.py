@@ -52,7 +52,7 @@ class ESIX:
                 write_ts_data(host, if_name, if_status_int)
                 if 'up' not in if_status:
                     send_mail(subject=self.subject,
-                              body=self.body.format(host, if_name, if_status))
+                              body=self.body.format(host, if_name, if_status[-3:]))
                 data[host].append({if_name: if_status})
         return data
     
