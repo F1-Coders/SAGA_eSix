@@ -1,8 +1,8 @@
 import os
-import requests
 import subprocess
 import influxdb_client
 from influxdb_client.client.write_api import SYNCHRONOUS
+from mail import send_mail
 
 # DB Server Config
 org = "eSix"
@@ -28,12 +28,6 @@ def write_ts_data(device, metric, value):
     data_point = influxdb_client.Point(device).field(metric, value)
     api_writer.write(bucket=bucket, org=org, record=data_point)
 
-def send_msg(msg):
-    msg_header = {"Content-Type": "application/json"}
-    response = requests.post(teams_token, headers=msg_header, json={'text': msg})
-    if not response.ok:
-        print(f"Teams alert sending error: {response.text}")
-
 def snmp_get(cmd):
     return filter(subprocess.check_output(cmd, shell=True).decode())
 
@@ -43,7 +37,8 @@ def filter(data_str):
 # esix
 class ESIX:
     def __init__(self):
-        self.msg = '* Device {}: Interface {} is {}!'
+        self.subject = 'SAGA Found eSix Device Interface Down!'
+        self.body = '<h1>Device {}</h1><br><p>Interface {} is {}!</p>'
         self.data = self.get_port_health()
 
     def get_port_health(self):
@@ -56,7 +51,8 @@ class ESIX:
                 if_status_int = int(if_status.split('(')[1].split(')')[0])
                 write_ts_data(host, if_name, if_status_int)
                 if 'up' not in if_status:
-                    send_msg(self.msg.format(host, if_name, if_status))
+                    send_mail(subject=self.subject,
+                              body=self.body.format(host, if_name, if_status))
                 data[host].append({if_name: if_status})
         return data
     
