@@ -43,8 +43,8 @@ def filter(data_str):
 # esix
 class ESIX:
     def __init__(self):
-        self.data = self.get_port_health()
         self.msg = '* Device {}: Interface {} is {}!'
+        self.data = self.get_port_health()
 
     def get_port_health(self):
         data = {}
@@ -62,4 +62,3 @@ class ESIX:
     
 if __name__ == "__main__":
     esix = ESIX()
-    esix.get_port_health()
