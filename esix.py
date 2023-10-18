@@ -84,7 +84,7 @@ class ESIX:
                 # Process interface issue
                 if self.is_init == True:
                     if host not in self.data.keys():
-                        self.data[host] = []
+                        self.data[host] = {}
                     self.data[host][if_name] = if_status
                 else:
                     data[host][if_name] = if_status
