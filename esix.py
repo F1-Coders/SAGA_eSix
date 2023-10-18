@@ -1,10 +1,15 @@
 import os
 import time
+import json
 import logging
 import subprocess
 import influxdb_client
 from influxdb_client.client.write_api import SYNCHRONOUS
 from mail import send_mail
+
+# File config
+back_json = 'bk.json'
+active_json = 'now.json'
 
 # Logging config
 logging.basicConfig(filename='history.log', 
@@ -43,6 +48,10 @@ def snmp_get(cmd):
     result = subprocess.check_output(cmd, shell=True).decode()
     result_list = [line.split(': ')[1] for line in result.split('\n')[:-1]]
     return result_list
+
+def save_json(data_dict, file_name):
+    with open(file_name, 'w') as f:
+        json.dump(data_dict, f, indent=4)
 
 # esix
 class ESIX:
@@ -88,7 +97,12 @@ class ESIX:
             if is_issue:
                 send_mail(subject=self.subject, body=msg)
                 logging.error(msg)
+        
+        # Save backup json
+        if self.is_init:
+            save_json(self.data, back_json)
         self.is_init = False
+        save_json(data, active_json)
     
 if __name__ == "__main__":
     esix = ESIX()
