@@ -48,8 +48,10 @@ def snmp_get(cmd):
 class ESIX:
     def __init__(self):
         self.subject = 'SAGA Found eSix Device Interface Down!'
-        self.body = 'Device: {}\n - Interface {} is {}'
-        #self.data = self.get_port_health()
+        self.body = '<h3>Device: {}</h3>'
+        self.part = '<li>Interface {} is {}</li>'
+        self.data = {}
+        self.is_init = True
 
     def get_port_health(self):
         data = {}
@@ -57,20 +59,36 @@ class ESIX:
             data[host] = []
             if_name_list = snmp_get(ifname_str.format(host))
             if_status_list = snmp_get(ifstatus_str.format(host))
+
+            # Create host mail taxt main part and init issue state to False
+            msg = self.body.format(devices[host])
+            is_issue = False
             for i in range(len(if_name_list)):
+                # Collect data
                 if_name = if_name_list[i]
                 if_status = if_status_list[i]
+
+                # Storage data to InfluxDB
                 if_status_int = int(if_status.split('(')[1].split(')')[0])
                 write_ts_data(host, if_name, if_status_int)
-                msg = self.body.format(devices[host], if_name, if_status[-3:])
-                if 'up' not in if_status:
-                    send_mail(subject=self.subject, body=msg)
+
+                # Process interface issue
+                if self.is_init == True:
+                    self.data[host].append({if_name: if_status})
+                else:
+                    data[host].append({if_name: if_status})
+                    if if_status != self.data[host][if_name]:
+                        is_issue = True
+                        part_str = self.part.format(if_name, if_status[-3:])
+                        msg += part_str
+
+            # Send mail when there is issue
+            if is_issue:
+                send_mail(subject=self.subject, body=msg)
                 logging.error(msg)
-                data[host].append({if_name: if_status})
-        return data
     
 if __name__ == "__main__":
     esix = ESIX()
     while True:
-        esix.data = esix.get_port_health()
+        esix.get_port_health()
         time.sleep(60)

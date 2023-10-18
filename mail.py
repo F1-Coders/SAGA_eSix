@@ -1,22 +1,13 @@
-from exchangelib import DELEGATE, Account, Credentials, Mailbox, Message
-
-credentials = Credentials(
-    username='saga.eubts@hotmail.com',  # Or me@example.com for O365
-    password='sagaCCXXLL3'
-)
-account = Account(
-    primary_smtp_address='saga.eubts@hotmail.com', 
-    credentials=credentials, 
-    autodiscover=True, 
-    access_type=DELEGATE
-)
+import smtplib
+from email.mime.text import MIMEText
+from email.header import Header
+ 
+sender = 'saga@f1.hk'
+receiver = 'jackal.cho@f1.hk'
+smtp_server = 'seg1.f1.hk'
 
 def send_mail(subject, body):
-    email = Message(account=account,
-                    folder=account.sent,
-                    subject=subject,
-                    body=body)
-    email.sender = Mailbox(email_address='saga.eubts@hotmail.com')
-    email.to_recipients = [Mailbox(email_address='jackal.cho@f1.hk'),
-                           Mailbox(email_address='servicedesk@f1.hk')]
-    email.send_and_save()
+    message = MIMEText(body, 'html', 'utf-8')
+    message['Subject'] = Header(subject, 'utf-8')
+    smtpObj = smtplib.SMTP(smtp_server, 25)
+    smtpObj.sendmail(sender, receiver, message.as_string())
