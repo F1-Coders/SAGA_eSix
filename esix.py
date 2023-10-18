@@ -56,7 +56,7 @@ class ESIX:
     def get_port_health(self):
         data = {}
         for host in devices:
-            data[host] = []
+            data[host] = {}
             if_name_list = snmp_get(ifname_str.format(host))
             if_status_list = snmp_get(ifstatus_str.format(host))
 
@@ -76,9 +76,9 @@ class ESIX:
                 if self.is_init == True:
                     if host not in self.data.keys():
                         self.data[host] = []
-                    self.data[host].append({if_name: if_status})
+                    self.data[host][if_name] = if_status
                 else:
-                    data[host].append({if_name: if_status})
+                    data[host][if_name] = if_status
                     if if_status != self.data[host][if_name]:
                         is_issue = True
                         part_str = self.part.format(if_name, if_status[-3:])
