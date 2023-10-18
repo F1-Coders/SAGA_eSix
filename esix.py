@@ -74,6 +74,8 @@ class ESIX:
 
                 # Process interface issue
                 if self.is_init == True:
+                    if host not in self.data.keys():
+                        self.data[host] = []
                     self.data[host].append({if_name: if_status})
                 else:
                     data[host].append({if_name: if_status})
@@ -86,6 +88,7 @@ class ESIX:
             if is_issue:
                 send_mail(subject=self.subject, body=msg)
                 logging.error(msg)
+        self.is_init = False
     
 if __name__ == "__main__":
     esix = ESIX()
